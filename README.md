@@ -23,6 +23,17 @@ If you add the ```-t``` flag it will just output the list of labels without doin
 ```
 python3 zenoparser.py -u "http://www.zeno.org/Kategorien/T/Pape-1880" -l 98890 -o ../test.xml
 ```
+
+## msb.py
+
+Converts the "John MacArthur Studienbibel (Schlachter_2000)" published by CLV in 2004 as pdf to an OSIS commentary. Please adjust lines 6 and 7. Line 6 holds the path to the PDF commentary (can be found on the web) and line 7 contains the output file. Convert the ouput using
+
+```
+osis2mod ~/.sword/modules/comments/zcom/MASB - < B.xml   -v Luther
+```
+
+and add a proper config file. That should be all... 
+
 ## convert.py
 
 This tool finds (german) bible references (Mt 4,4) in free text and converts them into OSIS format (```<reference osisRef="Matt.4.4">Mt 4,4</reference>```). It can identify ranges (Mt 4,3-6) and can foresee at least one reference without book (Mt 3,4; 6,8). The book names are stored in a dict. 

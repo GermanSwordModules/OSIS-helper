@@ -71,8 +71,10 @@ for l in linkliste:
 	container = soup.find ("div", {"class": "zenoCOMain"})
 	if container==None:
 		print ("Error on entry "+"http://www.zeno.org/"+l[1])
+		continue
 	if container.find("p")==None:
 		print ("Error 2 on entry "+"http://www.zeno.org/"+l[1])
+		continue
 	text = str(container.find("p"))[3:][:-4]
 	text = text.replace ("<b>", '<hi rend="bold">')
 	text = text.replace ("</b>", '</hi>')
