@@ -14,15 +14,30 @@ Example run:
 python pfn.py -i fn5 -w Mauerhofer-Einleitung.xml
 ```
 If you add the ```-t``` flag it will just output the list of labels without doing any changes to the xml file.
+
 ## zenoparser.py 
 * Converts public domain dictionaries from zeno.org to TEI Dictionaries (see https://wiki.crosswire.org/TEI_Dictionaries). 
 * Takes the link to the "Alle Artikel" page (-u)
 * Takes the maximum page which links to the last entry
 * Takes an output xml-file.
 * Test run with -t flag skips after approx. 100 pages. 
+* If no transliteration is needed, add -r flag.
+
+### Examples
+For the Greek dictionary:
 ```
 python3 zenoparser.py -u "http://www.zeno.org/Kategorien/T/Pape-1880" -l 98890 -o ../test.xml
 ```
+For the Latin dictionary:
+```
+python3 zenoparser.py -u "http://www.zeno.org/Kategorien/T/Georges-1913" -l 54830 -o ../test.xml -r
+```
+
+Converting the xml-file to a dict can be done using ```tei2mod```:
+```
+tei2mod ~/.sword/modules/lexdict/rawld4/pape/ test.xml
+```
+The output folder links directly to your sword module location. After that, you need to create a file ```pape.conf``` at ```~/.sword/mods.d/``` with the suggested valued outputed by ```tei2mod``` (remember to change the description, encoding is UTF-8).
 
 ## msb.py
 

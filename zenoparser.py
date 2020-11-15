@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import re
 from transliterate import translit, get_available_language_codes
 import sys
+import unicodedata as ud
 
 parser = ArgumentParser()
 parser.add_argument("-u", "--url", dest="url", 
@@ -15,7 +16,10 @@ parser.add_argument("-o", "--output", dest="filenameOut",
 parser.add_argument("-t", "--try", 
                     action="store_true", dest="verbose", default=False, 
                     help="just a test run")
-
+parser.add_argument("-r", "--transoff", 
+                    action="store_false", dest="transliterate", default=True, 
+                    help="without transliteration")
+d = {ord('\N{COMBINING ACUTE ACCENT}'):None}
 args = parser.parse_args()
 lastpage = int(args.lastpage)
 linkliste = []
@@ -29,7 +33,7 @@ for i in range (0,lastpage, 20):
 	links = soup.find_all('a')
 	for l in links:
 		#print (l.text + " : "+l['href'])
-		if "/A" in l['href']:
+		if "/A" in l['href'] and not "Amazon" in l['href'] and not "amazon" in l['href']:
 			linkliste.append ([l.text , l['href']])
 	
 	if args.verbose and i > 100:
@@ -76,17 +80,19 @@ for l in linkliste:
 		print ("Error 2 on entry "+"http://www.zeno.org/"+l[1])
 		continue
 	text = str(container.find("p"))[3:][:-4]
-	text = text.replace ("<b>", '<hi rend="bold">')
-	text = text.replace ("</b>", '</hi>')
-	text = text.replace ("<i>", '<hi rend="italic">')
-	text = text.replace ("</i>", '</hi>')
-	text = text.replace ('<span class="zenoTXSpaced">', '<hi rend="underline">')
-	text = text.replace ("</span>", '</hi>')
+	text = text.replace ("<b>", '<orth rend="bold">')
+	text = text.replace ("</b>", '</orth>')
+	text = text.replace ("<i>", '<orth rend="italic">')
+	text = text.replace ("</i>", '</orth>')
+	text = text.replace ('<span class="zenoTXSpaced">', '<orth rend="bold">')
+	text = text.replace ("</span>", '</orth>')
+	text = text.replace ("<p>", '<lb/>')
+	text = text.replace ("</p>", '<lb/>')
 	clean = re.compile('<a.*?>')
 	text = re.sub(clean, '', text)
 	clean = re.compile('</a.*?>')
 	text = re.sub(clean, '', text)
-	lemma = l[0].replace( "ἀ", "α")
+	lemma = ud.normalize('NFD',l[0]).translate(d).replace( "ἀ", "α")
 	lemma = lemma.replace ("ἆ",  "α")
 	lemma = lemma.replace ("ὰ",  "α")
 	lemma = lemma.replace ("ἄ",  "α") 
@@ -100,18 +106,24 @@ for l in linkliste:
 	lemma = lemma.replace ("ώ",  "ω")
 	#print (l[0] )
 	#print ("-- : "+translit(lemma, 'el', reversed=True) )
-	trans = translit(lemma, 'el', reversed=True)
-	if trans in dlist:
-		trans = trans + " "+str(i)
-	dlist.append(trans)
-	if l[0] in glist:
-		l[0] = l[0] + " "+str(i)
-	glist.append (l[0])
-	entrytext = '''<entryFree n="'''+l[0]+'''|'''+trans+'''|P'''+str(i).zfill(10)+'''">
- <title>'''+l[0]+'''</title>
- <orth type="trans" rend="bold">'''+trans+'''</orth>
- <def>'''+text+'''</def>
-</entryFree>'''
+	if args.transliterate:
+		trans = translit(lemma, 'el', reversed=True)
+		if trans in dlist:
+			trans = trans + " "+str(i)
+		dlist.append(trans)
+		if l[0] in glist:
+			l[0] = l[0] + " "+str(i)
+		glist.append (l[0])
+		entrytext = '''<entryFree n="'''+ud.normalize('NFD',l[0]).translate(d)+'''|'''+trans+'''|P'''+str(i).zfill(10)+'''">
+	 <title>'''+l[0]+'''</title>
+	 <orth type="trans" rend="bold">'''+trans+'''</orth>
+	 <def>'''+text+'''</def>
+	</entryFree>'''
+	else:
+		entrytext = '''<entryFree n="'''+ud.normalize('NFD',l[0]).translate(d)+'''|P'''+str(i).zfill(10)+'''">
+	 <title>'''+l[0]+'''</title>
+	 <def>'''+text+'''</def>
+	</entryFree>'''
 	f3.write(entrytext)
 	i = i+1
 	#if args.verbose and i > 41:
