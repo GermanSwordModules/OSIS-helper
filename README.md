@@ -1,5 +1,5 @@
 # OSIS-helper
-Little tools to support the generation of OSIS modules (see https://crosswire.org/osis/). They can be used to create SWORD Modules.
+Little tools to support the generation of OSIS modules (see https://crosswire.org/osis/). They can be used to create SWORD Modules or extract parts of data from the web for further research.
 
 ## pfn.py
 
@@ -52,3 +52,20 @@ and add a proper config file. That should be all...
 ## convert.py
 
 This tool finds (german) bible references (Mt 4,4) in free text and converts them into OSIS format (```<reference osisRef="Matt.4.4">Mt 4,4</reference>```). It can identify ranges (Mt 4,3-6) and can foresee at least one reference without book (Mt 3,4; 6,8). The book names are stored in a dict. 
+
+# Parse Online Bibles
+
+With these parsers it is possible to scrape some data from online bibles and convert it to OSIS XML, which can be converted to Sword modules. Not all parsers work with all web sites. For scientific purposes, scraping data from the web is legal - to a certain extent. 
+
+``urlparser.py`` uses selenium.
+
+Example usage:
+
+```
+python3 urlparser.py -u https://www.url -o LUT.xml -b LUT -w LUT
+```
+
+``urlparser2.py`` uses requests and can be used for English texts.
+```
+python3 urlparser2.py -u https://www.biblegateway.com -o ASV.xml -b ASV -w ASV
+```
